@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Palette avoids red/green pairings: blue = good, orange = needs attention.
+   Status is always also shown with words and arrows, never color alone. */
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --muted: #475569;
+  --line: #dbe3ee;
+  --brand: #1d4ed8;
+  --warn: #c2410c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220;
+    --card: #131c2e;
+    --ink: #e6edf7;
+    --muted: #9fb0c8;
+    --line: #243350;
+    --brand: #6ea0ff;
+    --warn: #fb923c;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
