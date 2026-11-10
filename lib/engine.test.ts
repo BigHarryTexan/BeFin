@@ -3,6 +3,7 @@ import {
   cardPayoff,
   cashFlow,
   creditSummary,
+  blankProfile,
   defaultProfile,
   estimateTax,
   futureImpacts,
@@ -214,5 +215,16 @@ describe("cashFlow", () => {
   it("monthly remaining equals net minus expenses", () => {
     const c = cashFlow(defaultProfile());
     expect(c.monthlyRemaining).toBeCloseTo(c.monthlyNet - c.monthlyExpenses, 6);
+  });
+});
+
+describe("blankProfile", () => {
+  it("has no dollar amounts pre-filled and still scores without NaN", () => {
+    const b = blankProfile();
+    expect(b.grossIncome).toBe(0);
+    expect(b.savings).toBe(0);
+    expect(b.state).toBe("");
+    const s = futureProofScore(b);
+    expect(Number.isFinite(s.total)).toBe(true);
   });
 });

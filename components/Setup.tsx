@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { FilingStatus, Profile } from "@/lib/types";
-import { US_STATES } from "@/lib/engine";
+import { defaultProfile, monthlyExpenses, US_STATES } from "@/lib/engine";
 import { Button, Card, Muted, NumberField, SelectField } from "./ui";
 
 export default function Setup({
@@ -26,7 +26,12 @@ export default function Setup({
     v: Profile["credit"][K],
   ) => setP((prev) => ({ ...prev, credit: { ...prev.credit, [k]: v } }));
 
-  const valid = p.grossIncome > 0 && p.age >= 16 && p.targetRetirementAge > p.age;
+  const valid =
+    p.grossIncome > 0 &&
+    monthlyExpenses(p) > 0 &&
+    p.age >= 16 &&
+    p.targetRetirementAge > p.age &&
+    p.state !== "";
 
   return (
     <form
@@ -67,7 +72,7 @@ export default function Setup({
             label="State"
             value={p.state}
             onChange={(v) => set("state", v)}
-            options={US_STATES.map((s) => ({ value: s, label: s }))}
+            options={[{ value: "", label: "Select…" }, ...US_STATES.map((s) => ({ value: s, label: s }))]}
           />
           <SelectField<FilingStatus>
             label="Filing status"
@@ -160,12 +165,17 @@ export default function Setup({
 
       {!valid && (
         <p className="text-sm font-semibold" style={{ color: "var(--warn)" }}>
-          ⚠ Enter your income, and a retirement age later than your current age.
+          ⚠ Add your age, state, yearly income and at least some monthly spending, with a retirement age later than your current age. Without your spending, the score would be meaningless.
         </p>
       )}
 
       <div className="flex gap-2">
         <Button type="submit">{isFirstTime ? "Build my dashboard" : "Save"}</Button>
+        {isFirstTime && (
+          <Button variant="ghost" onClick={() => setP(defaultProfile())}>
+            Fill with example numbers
+          </Button>
+        )}
         {onCancel && (
           <Button variant="ghost" onClick={onCancel}>
             Cancel

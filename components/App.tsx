@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Profile } from "@/lib/types";
-import { defaultProfile } from "@/lib/engine";
+import { blankProfile, defaultProfile } from "@/lib/engine";
 import Setup from "./Setup";
 import Overview from "./Overview";
 import Safety from "./Safety";
@@ -80,7 +80,7 @@ export default function App() {
     return (
       <main className="mx-auto max-w-xl p-4 pb-12">
         <Setup
-          initial={profile ?? defaultProfile()}
+          initial={profile ?? blankProfile()}
           isFirstTime={!profile}
           onSave={(p) => {
             save(p);

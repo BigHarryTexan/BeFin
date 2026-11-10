@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 export function Card({
   title,
@@ -71,6 +71,9 @@ export function NumberField({
   max?: number;
   hint?: string;
 }) {
+  // Keep the raw text so "0." or "0.5" can be typed; show empty (placeholder 0) when the value is 0.
+  const [text, setText] = useState("");
+  const shown = (Number(text) || 0) === value ? text : value === 0 ? "" : String(value);
   return (
     <label className="block">
       <span className="text-sm font-medium">{label}</span>
@@ -83,11 +86,15 @@ export function NumberField({
           type="number"
           inputMode="decimal"
           className="w-full bg-transparent px-2 py-2 outline-none"
-          value={Number.isFinite(value) ? value : 0}
+          placeholder="0"
+          value={shown}
           step={step}
           min={min}
           max={max}
-          onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+          onChange={(e) => {
+            setText(e.target.value);
+            onChange(e.target.value === "" ? 0 : Number(e.target.value) || 0);
+          }}
         />
         {suffix && <span style={{ color: "var(--muted)" }}>{suffix}</span>}
       </div>

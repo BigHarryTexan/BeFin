@@ -527,3 +527,26 @@ export function defaultProfile(): Profile {
     },
   };
 }
+
+/**
+ * First-run starting point: every dollar amount is empty so nobody gets a confident-looking
+ * score built from numbers they never entered. Only neutral structural defaults are set.
+ */
+export function blankProfile(): Profile {
+  const d = defaultProfile();
+  return {
+    ...d,
+    age: 0,
+    state: "",
+    grossIncome: 0,
+    savings: 0,
+    retirementBalance: 0,
+    retirementPct: 0,
+    employerMatchPct: 0,
+    expenses: { housing: 0, transportation: 0, utilities: 0, debt: 0, lifestyle: 0 },
+    cardBalance: 0,
+    cardApr: 0,
+    cardPayment: 0,
+    credit: { history: [], utilization: 0, openAccounts: 0, hardInquiries: 0, latePayments: 0 },
+  };
+}
