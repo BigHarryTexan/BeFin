@@ -2,6 +2,7 @@ import type {
   ComponentKey,
   FilingStatus,
   Profile,
+  Grade,
   ScoreResult,
   TaxResult,
 } from "./types";
@@ -306,7 +307,7 @@ export function utilizationInsight(utilizationPct: number): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* FutureProof Score (0 - 1000)                                        */
+/* FutureProof Grade (A - D, from an overall percentage)              */
 /* ------------------------------------------------------------------ */
 
 export const SCORE_WEIGHTS: Record<ComponentKey, number> = {
@@ -325,11 +326,28 @@ export const COMPONENT_LABELS: Record<ComponentKey, string> = {
   creditHealth: "Credit Health",
 };
 
-export function scoreLabel(total: number): string {
-  if (total < 500) return "Needs work";
-  if (total < 700) return "Fair";
-  if (total < 850) return "Good";
-  return "Excellent";
+/**
+ * Grade cutoffs on the overall percentage, highest first. Change them here only;
+ * the app and its "How is this calculated?" notes read from this list.
+ */
+export const GRADE_BANDS: { min: number; grade: Grade; label: string }[] = [
+  { min: 85, grade: "A", label: "Excellent" },
+  { min: 70, grade: "B", label: "Good" },
+  { min: 50, grade: "C", label: "Fair" },
+  { min: 0, grade: "D", label: "Needs work" },
+];
+
+export function gradeFor(percent: number): { grade: Grade; label: string } {
+  const band = GRADE_BANDS.find((b) => percent >= b.min) ?? GRADE_BANDS[GRADE_BANDS.length - 1];
+  return { grade: band.grade, label: band.label };
+}
+
+/** Human-readable range for a band, e.g. "70-84%". */
+export function gradeRangeText(index: number): string {
+  const b = GRADE_BANDS[index];
+  if (index === 0) return `${b.min}% or more`;
+  if (index === GRADE_BANDS.length - 1) return `under ${GRADE_BANDS[index - 1].min}%`;
+  return `${b.min}-${GRADE_BANDS[index - 1].min - 1}%`;
 }
 
 export function futureProofScore(p: Profile): ScoreResult {
@@ -375,7 +393,9 @@ export function futureProofScore(p: Profile): ScoreResult {
   const strongest = keys.reduce((a, b) => (components[b] > components[a] ? b : a));
   const weakest = keys.reduce((a, b) => (components[b] < components[a] ? b : a));
 
-  return { total, label: scoreLabel(total), components, strongest, weakest };
+  const percent = Math.floor(total / 10);
+  const { grade, label } = gradeFor(percent);
+  return { total, percent, grade, label, components, strongest, weakest };
 }
 
 /* ------------------------------------------------------------------ */
@@ -465,14 +485,14 @@ export function futureImpacts(p: Profile, w: WhatIf): Impact[] {
     });
   }
 
-  // Overall score
-  const sA = futureProofScore(p).total;
-  const sB = futureProofScore(next).total;
+  // Overall grade (letter plus whole percent, so progress shows even within one letter)
+  const gA = futureProofScore(p);
+  const gB = futureProofScore(next);
   out.push({
-    title: "FutureProof Score",
-    before: String(sA),
-    after: String(sB),
-    direction: sB > sA ? "better" : sB < sA ? "worse" : "same",
+    title: "FutureProof Grade",
+    before: `${gA.grade} (${gA.percent}%)`,
+    after: `${gB.grade} (${gB.percent}%)`,
+    direction: gB.total > gA.total ? "better" : gB.total < gA.total ? "worse" : "same",
   });
 
   return out;

@@ -157,7 +157,7 @@ export default function Credit({ profile, onChange }: { profile: Profile; onChan
             healthy, and above 30% may hold your score back.
           </p>
           <p>
-            <strong>In your FutureProof Score,</strong> Credit Health is 60% your FICO score (300 = 0%, 850 = 100%) and
+            <strong>In your FutureProof Grade,</strong> Credit Health is 60% your FICO score (300 = 0%, 850 = 100%) and
             40% your credit usage (10% or less = 100%, 50% or more = 0%), minus 10 points for each late payment in the
             last 2 years (up to 30).
           </p>

@@ -162,7 +162,7 @@ export default function Setup({
 
       {!valid && (
         <p className="text-sm font-semibold" style={{ color: "var(--warn)" }}>
-          ⚠ Add your age, state, yearly income and at least some monthly spending, with a retirement age later than your current age. Without your spending, the score would be meaningless.
+          ⚠ Add your age, state, yearly income and at least some monthly spending, with a retirement age later than your current age. Without your spending, the grade would be meaningless.
         </p>
       )}
 

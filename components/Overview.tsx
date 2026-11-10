@@ -4,6 +4,7 @@ import type { ComponentKey, Profile, TaxResult } from "@/lib/types";
 import {
   COMPONENT_LABELS,
   DEFAULT_STATE_RATE,
+  GRADE_BANDS,
   MEDICARE_RATE,
   NO_INCOME_TAX_STATES,
   SCORE_WEIGHTS,
@@ -14,18 +15,19 @@ import {
   estimateTax,
   fmtMoney,
   futureProofScore,
+  gradeRangeText,
   projectRetirement,
 } from "@/lib/engine";
 import { Card, HowCalculated, Muted } from "./ui";
 
 const totalTax = (t: TaxResult) => t.federal + t.socialSecurity + t.medicare + t.state;
 
-function Ring({ value }: { value: number }) {
+function Ring({ value, grade, label }: { value: number; grade: string; label: string }) {
   const r = 54;
   const c = 2 * Math.PI * r;
   const frac = Math.min(1, Math.max(0, value / 1000));
   return (
-    <svg viewBox="0 0 140 140" className="h-36 w-36 shrink-0" role="img" aria-label={`FutureProof Score ${value} out of 1000`}>
+    <svg viewBox="0 0 140 140" className="h-36 w-36 shrink-0" role="img" aria-label={`FutureProof Grade ${grade}, ${label}`}>
       <circle cx="70" cy="70" r={r} fill="none" stroke="var(--line)" strokeWidth="12" />
       <circle
         cx="70"
@@ -38,8 +40,8 @@ function Ring({ value }: { value: number }) {
         strokeDasharray={`${c * frac} ${c}`}
         transform="rotate(-90 70 70)"
       />
-      <text x="70" y="78" textAnchor="middle" fontSize="34" fontWeight="700" fill="var(--ink)">
-        {value}
+      <text x="70" y="88" textAnchor="middle" fontSize="64" fontWeight="700" fill="var(--ink)">
+        {grade}
       </text>
     </svg>
   );
@@ -107,10 +109,10 @@ export default function Overview({ profile }: { profile: Profile }) {
     <>
       <Card>
         <div className="flex items-center gap-4">
-          <Ring value={score.total} />
+          <Ring value={score.total} grade={score.grade} label={score.label} />
           <div>
             <div className="text-xs uppercase tracking-wide" style={{ color: "var(--muted)" }}>
-              FutureProof Score
+              FutureProof Grade
             </div>
             <div className="text-2xl font-bold">{score.label}</div>
             <p className="mt-2 text-sm">
@@ -139,8 +141,9 @@ export default function Overview({ profile }: { profile: Profile }) {
         </ul>
         <HowCalculated>
           <p>
-            Your score is five parts. Each part is graded from 0% to 100%, multiplied by its weight, and the results add
-            up to a number out of 1000.
+            Your grade comes from five parts. Each part is rated from 0% to 100%, multiplied by its weight, and the
+            results add up to an overall percentage. The overall percentage sets the letter:{" "}
+            {GRADE_BANDS.map((b, i) => `${b.grade} = ${gradeRangeText(i)}`).join(", ")}.
           </p>
           <ul className="list-disc space-y-1 pl-5">
             <li>
@@ -164,13 +167,13 @@ export default function Overview({ profile }: { profile: Profile }) {
               points, up to 30. With no score entered, only credit usage counts.
             </li>
           </ul>
-          <table className="w-full text-left">
+          <table className="w-full text-left [&_td:not(:last-child)]:pr-3 [&_th:not(:last-child)]:pr-3">
             <thead>
               <tr style={{ color: "var(--muted)" }}>
                 <th className="font-medium">Part</th>
-                <th className="font-medium">Grade</th>
+                <th className="font-medium">How you did</th>
                 <th className="font-medium">Weight</th>
-                <th className="text-right font-medium">Points</th>
+                <th className="text-right font-medium">Adds</th>
               </tr>
             </thead>
             <tbody>
@@ -179,17 +182,18 @@ export default function Overview({ profile }: { profile: Profile }) {
                   <td>{COMPONENT_LABELS[k]}</td>
                   <td>{pctOf(score.components[k] * 100)}</td>
                   <td>{pctOf(SCORE_WEIGHTS[k] * 100)}</td>
-                  <td className="text-right">{(score.components[k] * SCORE_WEIGHTS[k] * 1000).toFixed(0)}</td>
+                  <td className="text-right">{(score.components[k] * SCORE_WEIGHTS[k] * 100).toFixed(1)}</td>
                 </tr>
               ))}
               <tr className="font-bold">
-                <td colSpan={3}>Total (out of 1000)</td>
-                <td className="text-right">{score.total}</td>
+                <td colSpan={3}>Overall: grade {score.grade}</td>
+                <td className="text-right">{score.percent}%</td>
               </tr>
             </tbody>
           </table>
           <p style={{ color: "var(--muted)" }}>
-            This is BeFin&apos;s own score for learning. It is not a credit score and no lender sees it.
+            Numbers are rounded, so small differences are normal. This is BeFin&apos;s own grade for learning. It is
+            not a credit score and no lender sees it.
           </p>
         </HowCalculated>
       </Card>

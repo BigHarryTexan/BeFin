@@ -8,6 +8,8 @@ import {
   estimateTax,
   futureImpacts,
   futureProofScore,
+  gradeFor,
+  GRADE_BANDS,
   monthsToEmergencyGoal,
   projectRetirement,
   runway,
@@ -268,5 +270,48 @@ describe("retirement progress", () => {
       extraCardPayment: 0,
     }).find((i) => i.title === "Retirement funded by your goal age")!;
     expect(row.direction).toBe("better");
+  });
+});
+
+describe("letter grade", () => {
+  it("maps percentages to A-D at the band edges", () => {
+    expect(gradeFor(100).grade).toBe("A");
+    expect(gradeFor(85).grade).toBe("A");
+    expect(gradeFor(84).grade).toBe("B");
+    expect(gradeFor(70).grade).toBe("B");
+    expect(gradeFor(69).grade).toBe("C");
+    expect(gradeFor(50).grade).toBe("C");
+    expect(gradeFor(49).grade).toBe("D");
+    expect(gradeFor(0).grade).toBe("D");
+  });
+
+  it("bands are ordered highest first and end at zero", () => {
+    const mins = GRADE_BANDS.map((b) => b.min);
+    expect([...mins].sort((a, b) => b - a)).toEqual(mins);
+    expect(mins[mins.length - 1]).toBe(0);
+  });
+
+  it("futureProofScore reports a grade consistent with its percent", () => {
+    for (const p of [defaultProfile(), blankProfile()]) {
+      const s = futureProofScore(p);
+      expect(s.percent).toBe(Math.floor(s.total / 10));
+      expect(s.grade).toBe(gradeFor(s.percent).grade);
+    }
+  });
+
+  it("What If shows a grade row, unchanged when nothing is moved", () => {
+    const p = defaultProfile();
+    const row = futureImpacts(p, { retirementPct: p.retirementPct, extraMonthlySavings: 0, extraCardPayment: 0 })
+      .find((i) => i.title === "FutureProof Grade")!;
+    expect(row.before).toMatch(/^[ABCD] \(\d+%\)$/);
+    expect(row.after).toBe(row.before);
+    expect(row.direction).toBe("same");
+  });
+
+  it("What If grade row responds when a slider that affects today's numbers moves", () => {
+    const p = { ...defaultProfile(), retirementBalance: 0, retirementPct: 0 };
+    const row = futureImpacts(p, { retirementPct: 15, extraMonthlySavings: 0, extraCardPayment: 0 })
+      .find((i) => i.title === "FutureProof Grade")!;
+    expect(row.before).not.toBe(row.after);
   });
 });

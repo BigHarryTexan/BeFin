@@ -80,7 +80,7 @@ export default function Retirement({ profile }: { profile: Profile }) {
           </p>
           <p>
             <strong>3. Funded %.</strong> {fmtMoney(base.balanceAtGoal)} ÷ {fmtMoney(base.targetBalance)} ={" "}
-            <strong>{funded}%</strong>. This is the number that feeds your FutureProof Score, so every dollar you save
+            <strong>{funded}%</strong>. This is the number that feeds your FutureProof Grade, so every dollar you save
             moves it.
           </p>
           <p>

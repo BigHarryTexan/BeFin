@@ -8,11 +8,11 @@ Most finance apps answer "what did I spend?" BeFin answers the questions people 
 
 | Screen | What it shows |
 | --- | --- |
-| Overview | FutureProof Score (0-1000), monthly money flow, tax reality |
+| Overview | FutureProof Grade (A-D), monthly money flow, tax reality |
 | Safety | Emergency fund monitor, "What if I lost my job tomorrow?" simulator |
 | Retire | Goal vs projected retirement age, contribution slider |
 | Credit | FICO history, credit health factors, links to the bureaus |
-| What If | Change one thing, see the effect on retirement, emergency fund, card interest and score |
+| What If | Change one thing, see the effect on retirement, emergency fund, card interest and grade |
 
 Installable PWA (manifest, service worker, icons) that works offline after the first visit.
 All data stays in the browser (`localStorage`). No account, no backend yet.

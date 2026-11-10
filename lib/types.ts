@@ -63,8 +63,16 @@ export interface TaxResult {
   effectiveRate: number;
 }
 
+export type Grade = "A" | "B" | "C" | "D";
+
 export interface ScoreResult {
+  /** Internal 0-1000 value used for math and tests. Not shown to users. */
   total: number;
+  /** total / 10, rounded down: the whole-percent overall result */
+  percent: number;
+  /** The letter users see */
+  grade: Grade;
+  /** Plain-words name for the grade ("Fair", "Good", ...) */
   label: string;
   components: Record<ComponentKey, number>;
   strongest: ComponentKey;
