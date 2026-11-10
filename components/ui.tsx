@@ -56,7 +56,6 @@ export function NumberField({
   onChange,
   prefix,
   suffix,
-  step = 1,
   min = 0,
   max,
   hint,
@@ -66,7 +65,6 @@ export function NumberField({
   onChange: (n: number) => void;
   prefix?: string;
   suffix?: string;
-  step?: number;
   min?: number;
   max?: number;
   hint?: string;
@@ -88,7 +86,7 @@ export function NumberField({
           className="w-full bg-transparent px-2 py-2 outline-none"
           placeholder="0"
           value={shown}
-          step={step}
+          step="any"
           min={min}
           max={max}
           onChange={(e) => {

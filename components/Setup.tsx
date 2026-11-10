@@ -94,7 +94,6 @@ export default function Setup({
             value={p.grossIncome}
             onChange={(n) => set("grossIncome", n)}
             prefix="$"
-            step={1000}
           />
           <SelectField
             label="Paid"
@@ -113,7 +112,6 @@ export default function Setup({
             onChange={(n) => set("retirementPct", n)}
             suffix="%"
             max={100}
-            step={0.5}
           />
           <NumberField
             label="Employer adds"
@@ -121,28 +119,27 @@ export default function Setup({
             onChange={(n) => set("employerMatchPct", n)}
             suffix="%"
             max={100}
-            step={0.5}
           />
         </div>
       </Card>
 
       <Card title="Monthly spending">
         <div className="grid grid-cols-2 gap-3">
-          <NumberField label="Housing" value={p.expenses.housing} onChange={(n) => setExp("housing", n)} prefix="$" step={50} />
-          <NumberField label="Transportation" value={p.expenses.transportation} onChange={(n) => setExp("transportation", n)} prefix="$" step={50} />
-          <NumberField label="Utilities" value={p.expenses.utilities} onChange={(n) => setExp("utilities", n)} prefix="$" step={25} />
-          <NumberField label="Debt payments" value={p.expenses.debt} onChange={(n) => setExp("debt", n)} prefix="$" step={25} hint="Cards, loans" />
-          <NumberField label="Everything else" value={p.expenses.lifestyle} onChange={(n) => setExp("lifestyle", n)} prefix="$" step={50} hint="Food, fun, shopping" />
+          <NumberField label="Housing" value={p.expenses.housing} onChange={(n) => setExp("housing", n)} prefix="$" />
+          <NumberField label="Transportation" value={p.expenses.transportation} onChange={(n) => setExp("transportation", n)} prefix="$" />
+          <NumberField label="Utilities" value={p.expenses.utilities} onChange={(n) => setExp("utilities", n)} prefix="$" />
+          <NumberField label="Debt payments" value={p.expenses.debt} onChange={(n) => setExp("debt", n)} prefix="$" hint="Cards, loans" />
+          <NumberField label="Everything else" value={p.expenses.lifestyle} onChange={(n) => setExp("lifestyle", n)} prefix="$" hint="Food, fun, shopping" />
         </div>
       </Card>
 
       <Card title="Savings and debt">
         <div className="grid grid-cols-2 gap-3">
-          <NumberField label="Emergency savings" value={p.savings} onChange={(n) => set("savings", n)} prefix="$" step={100} />
-          <NumberField label="Retirement accounts" value={p.retirementBalance} onChange={(n) => set("retirementBalance", n)} prefix="$" step={1000} />
-          <NumberField label="Credit card balance" value={p.cardBalance} onChange={(n) => set("cardBalance", n)} prefix="$" step={100} />
-          <NumberField label="Card interest rate" value={p.cardApr} onChange={(n) => set("cardApr", n)} suffix="%" step={0.5} max={100} />
-          <NumberField label="Card payment each month" value={p.cardPayment} onChange={(n) => set("cardPayment", n)} prefix="$" step={25} />
+          <NumberField label="Emergency savings" value={p.savings} onChange={(n) => set("savings", n)} prefix="$" />
+          <NumberField label="Retirement accounts" value={p.retirementBalance} onChange={(n) => set("retirementBalance", n)} prefix="$" />
+          <NumberField label="Credit card balance" value={p.cardBalance} onChange={(n) => set("cardBalance", n)} prefix="$" />
+          <NumberField label="Card interest rate" value={p.cardApr} onChange={(n) => set("cardApr", n)} suffix="%" max={100} />
+          <NumberField label="Card payment each month" value={p.cardPayment} onChange={(n) => set("cardPayment", n)} prefix="$" />
         </div>
       </Card>
 
