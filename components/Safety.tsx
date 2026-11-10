@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Profile } from "@/lib/types";
 import { cashFlow, fmtMoney, runway } from "@/lib/engine";
-import { Button, Card, Muted, Stat } from "./ui";
+import { Button, Card, HowCalculated, Muted, Stat } from "./ui";
 
 export default function Safety({ profile }: { profile: Profile }) {
   const [simulating, setSimulating] = useState(false);
@@ -12,6 +12,7 @@ export default function Safety({ profile }: { profile: Profile }) {
   const finite = Number.isFinite(rw.months);
   const progress = finite ? Math.min(1, rw.months / rw.recommendedMonths) : 1;
   const onTrack = rw.gapMonths === 0;
+  const e = profile.expenses;
 
   return (
     <>
@@ -38,6 +39,27 @@ export default function Safety({ profile }: { profile: Profile }) {
             That is about {fmtMoney(rw.gapDollars)} more to save. Six months of expenses is the usual target.
           </Muted>
         )}
+
+        <HowCalculated>
+          <p>
+            <strong>Monthly spending</strong> = housing {fmtMoney(e.housing)} + transportation {fmtMoney(e.transportation)}{" "}
+            + utilities {fmtMoney(e.utilities)} + debt payments {fmtMoney(e.debt)} + everything else{" "}
+            {fmtMoney(e.lifestyle)} = <strong>{fmtMoney(cf.monthlyExpenses)}</strong>.
+          </p>
+          <p>
+            <strong>Months covered</strong> = savings ÷ monthly spending = {fmtMoney(profile.savings)} ÷{" "}
+            {fmtMoney(cf.monthlyExpenses)} = <strong>{finite ? rw.months.toFixed(1) : "—"}</strong>.
+          </p>
+          <p>
+            <strong>Days</strong> = months × 30. <strong>Target</strong> = {rw.recommendedMonths} months of spending ={" "}
+            {fmtMoney(rw.recommendedMonths * cf.monthlyExpenses)}. <strong>Gap</strong> = target − savings ={" "}
+            {fmtMoney(rw.gapDollars)}.
+          </p>
+          <p style={{ color: "var(--muted)" }}>
+            Six months is a common rule of thumb. Some people aim for 3 if their job is very stable, or more if their
+            income varies.
+          </p>
+        </HowCalculated>
       </Card>
 
       <Card title="Job loss simulator">
@@ -58,6 +80,17 @@ export default function Safety({ profile }: { profile: Profile }) {
             <Muted>
               Does not count unemployment benefits, severance, or cutting back. It is a worst-case planning number.
             </Muted>
+            <HowCalculated>
+              <p>
+                Same math as above: savings ÷ monthly spending, then × 30 days. {fmtMoney(profile.savings)} ÷{" "}
+                {fmtMoney(cf.monthlyExpenses)} = {finite ? rw.months.toFixed(2) : "—"} months ={" "}
+                <strong>{finite ? rw.days : "—"} days</strong>.
+              </p>
+              <p>
+                It assumes every bill keeps coming and no money comes in. In real life you could cut spending or collect
+                unemployment, so treat it as a worst case.
+              </p>
+            </HowCalculated>
             <Button variant="ghost" onClick={() => setSimulating(false)}>
               Close
             </Button>

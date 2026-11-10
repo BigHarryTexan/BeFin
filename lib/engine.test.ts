@@ -228,3 +228,45 @@ describe("blankProfile", () => {
     expect(Number.isFinite(s.total)).toBe(true);
   });
 });
+
+describe("retirement progress", () => {
+  const young = () => {
+    const p = defaultProfile();
+    return {
+      ...p,
+      age: 23,
+      grossIncome: 42000,
+      retirementBalance: 2000,
+      retirementPct: 3,
+      employerMatchPct: 0,
+    };
+  };
+
+  it("gives partial credit even when the target is out of reach by 90", () => {
+    const r = projectRetirement(young());
+    expect(r.projectedAge).toBeNull();
+    expect(r.fundedPct).toBeGreaterThan(0.1);
+    expect(r.fundedPct).toBeLessThan(1);
+    expect(futureProofScore(young()).components.retirement).toBeCloseTo(r.fundedPct, 10);
+  });
+
+  it("grows with a larger balance and a higher contribution", () => {
+    const base = projectRetirement(young()).fundedPct;
+    expect(projectRetirement({ ...young(), retirementBalance: 20000 }).fundedPct).toBeGreaterThan(base);
+    expect(projectRetirement(young(), 10).fundedPct).toBeGreaterThan(base);
+  });
+
+  it("is zero with no savings and no contributions", () => {
+    const p = { ...young(), retirementBalance: 0, retirementPct: 0 };
+    expect(projectRetirement(p).fundedPct).toBe(0);
+  });
+
+  it("shows up as a What If row that moves when the contribution rises", () => {
+    const row = futureImpacts(young(), {
+      retirementPct: 10,
+      extraMonthlySavings: 0,
+      extraCardPayment: 0,
+    }).find((i) => i.title === "Retirement funded by your goal age")!;
+    expect(row.direction).toBe("better");
+  });
+});

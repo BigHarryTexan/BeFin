@@ -46,21 +46,21 @@ const BRACKETS: Record<FilingStatus, Bracket[]> = {
   ],
 };
 
-const STANDARD_DEDUCTION: Record<FilingStatus, number> = {
+export const STANDARD_DEDUCTION: Record<FilingStatus, number> = {
   single: 15750,
   married: 31500,
   head: 23625,
 };
 
-const SS_RATE = 0.062;
-const SS_WAGE_BASE = 176100;
-const MEDICARE_RATE = 0.0145;
+export const SS_RATE = 0.062;
+export const SS_WAGE_BASE = 176100;
+export const MEDICARE_RATE = 0.0145;
 
-const NO_INCOME_TAX_STATES = new Set([
+export const NO_INCOME_TAX_STATES = new Set([
   "AK", "FL", "NV", "NH", "SD", "TN", "TX", "WA", "WY",
 ]);
 /** Very rough effective state income-tax rate used when a state taxes wages. */
-const DEFAULT_STATE_RATE = 0.045;
+export const DEFAULT_STATE_RATE = 0.045;
 
 export const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN",
@@ -197,6 +197,10 @@ export interface RetirementProjection {
   projectedAge: number | null;
   targetBalance: number;
   yearsOffGoal: number | null;
+  /** Projected balance on the day you reach your goal retirement age */
+  balanceAtGoal: number;
+  /** balanceAtGoal / targetBalance, capped at 1. Grows with every dollar saved. */
+  fundedPct: number;
 }
 
 /** Retirement spending is today's spending, assuming debt payments are gone. */
@@ -219,11 +223,20 @@ export function projectRetirement(
     age += 1;
   }
   const projectedAge = balance >= target ? age : null;
+
+  // Progress measure: where will the balance stand when the goal age arrives?
+  let atGoal = p.retirementBalance;
+  for (let a = p.age; a < p.targetRetirementAge; a++) {
+    atGoal = atGoal * (1 + REAL_RETURN) + annualContribution;
+  }
+
   return {
     projectedAge,
     targetBalance: target,
     yearsOffGoal:
       projectedAge === null ? null : projectedAge - p.targetRetirementAge,
+    balanceAtGoal: atGoal,
+    fundedPct: target > 0 ? clamp(atGoal / target, 0, 1) : 1,
   };
 }
 
@@ -331,9 +344,9 @@ export function futureProofScore(p: Profile): ScoreResult {
 
   const emergencyScore = clamp(rw.months / RECOMMENDED_EMERGENCY_MONTHS, 0, 1);
 
-  let retirementScore: number;
-  if (ret.projectedAge === null) retirementScore = 0;
-  else retirementScore = clamp(1 - Math.max(0, ret.yearsOffGoal ?? 0) / 10, 0, 1);
+  // Graded on progress (how funded you'll be at your goal age), not pass/fail, so
+  // someone early in their journey still sees credit for what they have saved.
+  const retirementScore = ret.fundedPct;
 
   // Debt payments at or above 36% of take-home counts as zero.
   const dti = cf.monthlyNet > 0 ? p.expenses.debt / cf.monthlyNet : 1;
@@ -408,6 +421,16 @@ export function futureImpacts(p: Profile, w: WhatIf): Impact[] {
     before: fmtAge(a.projectedAge),
     after: fmtAge(b.projectedAge),
     direction: compareAge(a.projectedAge, b.projectedAge),
+  });
+
+  // Retirement progress (moves even when the retirement age does not)
+  const fa = Math.round(a.fundedPct * 100);
+  const fb = Math.round(b.fundedPct * 100);
+  out.push({
+    title: "Retirement funded by your goal age",
+    before: `${fa}%`,
+    after: `${fb}%`,
+    direction: fb > fa ? "better" : fb < fa ? "worse" : "same",
   });
 
   // Emergency fund goal

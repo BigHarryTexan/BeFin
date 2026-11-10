@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Profile } from "@/lib/types";
 import { creditSummary, utilizationInsight } from "@/lib/engine";
-import { Button, Card, Muted, NumberField, Stat, Trend } from "./ui";
+import { Button, Card, HowCalculated, Muted, NumberField, Stat, Trend } from "./ui";
 
 const LINKS = [
   { name: "Credit Karma", note: "Score monitoring and credit changes", href: "https://www.creditkarma.com" },
@@ -147,6 +147,21 @@ export default function Credit({ profile, onChange }: { profile: Profile; onChan
             ? "On-time payments are the biggest factor in your score. Keep every account current from here."
             : "No late payments. That is the biggest factor in your score, so protect it."}
         </Muted>
+        <HowCalculated>
+          <p>
+            <strong>Change</strong> = your newest score − the one before it. BeFin never pulls your real score. You type
+            it in from Credit Karma, your bank, or a bureau.
+          </p>
+          <p>
+            <strong>Credit usage</strong> = your card balances ÷ your credit limits. Under 10% is excellent, up to 30% is
+            healthy, and above 30% may hold your score back.
+          </p>
+          <p>
+            <strong>In your FutureProof Score,</strong> Credit Health is 60% your FICO score (300 = 0%, 850 = 100%) and
+            40% your credit usage (10% or less = 100%, 50% or more = 0%), minus 10 points for each late payment in the
+            last 2 years (up to 30).
+          </p>
+        </HowCalculated>
       </Card>
 
       <Card title="Credit resources">

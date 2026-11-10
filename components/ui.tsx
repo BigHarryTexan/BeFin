@@ -159,6 +159,18 @@ export function Button({
   );
 }
 
+/** Collapsible plain-language explanation under a card. */
+export function HowCalculated({ children }: { children: ReactNode }) {
+  return (
+    <details className="mt-3 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--line)" }}>
+      <summary className="cursor-pointer font-semibold" style={{ color: "var(--brand)" }}>
+        How is this calculated?
+      </summary>
+      <div className="mt-2 space-y-2">{children}</div>
+    </details>
+  );
+}
+
 /** Status chip: always pairs a symbol and a word with the color. */
 export function Trend({ direction }: { direction: "better" | "worse" | "same" }) {
   const map = {

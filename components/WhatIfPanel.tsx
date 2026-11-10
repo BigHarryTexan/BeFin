@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Profile } from "@/lib/types";
 import { futureImpacts, type WhatIf } from "@/lib/engine";
-import { Button, Card, Muted, Trend } from "./ui";
+import { Button, Card, HowCalculated, Muted, Trend } from "./ui";
 
 function Slider({
   label,
@@ -112,6 +112,31 @@ export default function WhatIfPanel({ profile }: { profile: Profile }) {
           Money left over after your bills is assumed to go into savings. Extra card payments come out of that same
           money. Estimates for learning, not advice.
         </Muted>
+        <HowCalculated>
+          <p>
+            Each slider changes a <strong>copy</strong> of your numbers. BeFin runs the same math as the other tabs on the
+            original and on the copy, then shows both results side by side. Nothing you move here is saved.
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <strong>Retirement contribution</strong> changes your take-home (taxes shift) and how fast your retirement
+              savings grow.
+            </li>
+            <li>
+              <strong>Save extra</strong> adds to the money going into savings each month, so the emergency fund goal
+              arrives sooner.
+            </li>
+            <li>
+              <strong>Pay extra on your card</strong> raises your card payment, which cuts the interest you pay and how
+              long it takes. That money comes out of what is left over each month.
+            </li>
+          </ul>
+          <p>
+            <strong>Emergency fund goal</strong> = months until savings reach 6 months of spending, saving each
+            month&apos;s leftover money. <strong>Card interest</strong> = every month&apos;s interest added up until the
+            card hits $0.
+          </p>
+        </HowCalculated>
       </Card>
     </>
   );
